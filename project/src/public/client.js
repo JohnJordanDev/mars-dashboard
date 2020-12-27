@@ -43,11 +43,8 @@ const render = async (root, state) => {
 //     `;
 // };
 
-const buildNavList = (roverList) => {
-  let list = "";
-  list = roverList.map((rover) => `<button>${rover}</button>`);
-  return list.join("");
-};
+const buildNavList = (roverList) =>
+  roverList.map((rover) => `<button>${rover}</button>`).join("");
 
 const App = (state) => {
   const { rovers, activeRover } = state;
@@ -56,7 +53,9 @@ const App = (state) => {
   <section class="dashboard_gallery">
                 <button><</button>
                 <div>
-                  <img height="300" width="300" src="${activeRoverData.photos[0].img_src}" alt="image from ${activeRover} rover"></div>
+                  <img height="300" width="300" src="${
+                    activeRoverData.photos[0].img_src
+                  }" alt="image from ${activeRover} rover"></div>
                 <button>></button>
             </section>
             <section class="dashboard_content">
