@@ -3,6 +3,7 @@ const store = {
   apod: "",
   rovers: ["Curiosity", "Opportunity", "Spirit"],
   activeRover: "",
+  allRoversData: []
 };
 
 // add our markup to the page
@@ -49,23 +50,38 @@ const isActive = (rover, state) => {
   return "";
 };
 
-const buildNavList = (roverList, state) =>
-  roverList
-    .map(
-      (rover) => `<button class="dashboard_roverList-button ${isActive(rover, state)}">${rover}</button>`
-    )
-    .join("");
+const buildNavList = (roverList, state) => roverList
+  .map(
+    (rover) => `<button class="dashboard_roverList-button ${isActive(
+      rover,
+      state
+    )}">${rover}</button>`
+  )
+  .join("");
+
+const getListRoverFacts = (activeRover) => `
+    <ul>
+      <li>Launch Date: ${activeRover.launchDate}</li>
+      <li>Landing Date: ${activeRover.landingDate}</li>
+      <li>Status: ${activeRover.status}</li>
+      <li>Date of most recent photos: ${activeRover.dateMostRecentPhotos}</li>   
+    </ul>`;
+
+const getActiveRoverData = (state) => {
+  return state.allRoversData.filter((rover) => rover.name === state.activeRover)[0];
+};
 
 const App = (state) => {
   const { rovers, activeRover } = state;
-  const activeRoverData = state[activeRover.toLowerCase()];
+  const activeRoverData = getActiveRoverData(state);
+  if (typeof activeRoverData === "undefined") {
+    return `<p>Loading...</p>`;
+  }
   return `
   <section class="dashboard_gallery">
                 <button><</button>
                 <div>
-                  <img height="300" width="300" src="${
-                    activeRoverData.photos[0].img_src
-                  }" alt="image from ${activeRover} rover"></div>
+                  <img height="300" width="300" src="${activeRoverData.photos[0].img_src}" alt="image from ${activeRover} rover"></div>
                 <button>></button>
             </section>
             <section class="dashboard_content">
@@ -77,17 +93,7 @@ const App = (state) => {
                         <h2>${activeRover}</h2>
                         <p>
                           Rover facts: 
-                          <ul>
-                            <li>Launch Date: ${activeRoverData.launchDate}</li>
-                            <li>Landing Date: ${
-                              activeRoverData.landingDate
-                            }</li>
-                            <li>Status: ${activeRoverData.status}</li>
-                            <li>Date of most recent photos: ${
-                              activeRoverData.dateMostRecentPhotos
-                            }</li>
-                            
-                          </ul>
+                          ${getListRoverFacts(activeRoverData)}
                         </p>
                     </header>
                 </section>
@@ -100,19 +106,6 @@ window.addEventListener("load", () => {
 });
 
 // ------------------------------------------------------  COMPONENTS
-
-// Pure function that renders conditional information -- THIS IS JUST AN EXAMPLE, you can delete it.
-const Greeting = (name) => {
-  if (name) {
-    return `
-            <h1>Welcome, ${name}!</h1>
-        `;
-  }
-
-  return `
-        <h1>Hello!</h1>
-    `;
-};
 
 // Example of a pure function that renders infomation requested from the backend
 const ImageOfTheDay = (apod) => {
@@ -154,30 +147,33 @@ const getImageOfTheDay = (state) => {
 };
 
 // Example API call
-const getSpiritData = (state) => {
-  let { spirit } = state;
+// Need to use ImmutableJS here
+const getSpiritData = (roverName, state) => {
+  let allRoversData = state.allRoversData;
   let data;
-  console.log("spirit is ", spirit);
-  console.log("store is ", store);
+  const lowerRoverName = roverName.toLowerCase();
+  let rover;
+  console.log("roverData ", allRoversData);
 
   fetch("http://localhost:3000/spirit")
     .then((res) => res.json())
     .then((spiritData) => {
       data = spiritData.spirit.rover;
-      console.log("spiritData is ", spiritData);
-      spirit = {
+      rover = {
+        name: roverName,
         launchDate: data.launch_date,
         landingDate: data.landing_date,
         status: data.status,
         dateMostRecentPhotos: data.max_date,
-        photos: spiritData.spiritPhotos.photos,
+        photos: spiritData.spiritPhotos.photos
       };
-      updateStore(store, { spirit, activeRover: "Spirit" });
+      allRoversData.push(rover);
+      updateStore(store, { allRoversData, activeRover: "Spirit" });
       render(root, store);
-      console.log("result is: ", store);
+      // console.log("result is: ", store);
     });
 
   // return data;
 };
 
-getSpiritData(store);
+getSpiritData("Spirit", store);
