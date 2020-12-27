@@ -67,9 +67,9 @@ const getListRoverFacts = (activeRover) => `
       <li>Date of most recent photos: ${activeRover.dateMostRecentPhotos}</li>   
     </ul>`;
 
-const getActiveRoverData = (state) => {
-  return state.allRoversData.filter((rover) => rover.name === state.activeRover)[0];
-};
+const getActiveRoverData = (state) => state.allRoversData.filter(
+  (rover) => rover.name === state.activeRover
+)[0];
 
 const App = (state) => {
   const { rovers, activeRover } = state;
