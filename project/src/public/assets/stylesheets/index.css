@@ -7,6 +7,12 @@ body {
   min-height: 100vh;
 }
 
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
 header {
   /* header styles */
 }
@@ -14,6 +20,28 @@ header {
 main {
   flex: 1;
   padding: 20px;
+}
+.main-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard_gallery {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.dashboard_roverList {
+  display: flex;
+  justify-content: space-around;
 }
 
 footer {
@@ -29,6 +57,14 @@ footer {
 
 @media (min-width: 1224px) {
   /* use mobile */
+  .dashboard {
+    flex-direction: row;
+    max-width: 800px;
+  }
+
+  .dashboard_gallery, .dashboard_content {
+    flex-basis: 50%;
+  }
 }
 
 /* -------------------  LARGE SCREENS  -------------- */

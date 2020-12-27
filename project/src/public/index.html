@@ -6,13 +6,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Mars Dashboard</title>
+    <link rel="stylesheet" href="assets/stylesheets/resets.css">
+    <link rel="stylesheet" href="assets/stylesheets/index.css">
 </head>
 
 <body>
-    <main>
-        <div id="root">
+    <main class="main-wrapper">
+        <header><h1>Mars Dashboard</h1></header>
+        <section id="rover-root" class="dashboard">
+            <section class="dashboard_gallery">
+                <button><</button>
+                <div><img height="300" width="300" src="" alt=""></div>
+                <button>></button>
+            </section>
+            <section class="dashboard_content">
+                <nav class="dashboard_roverList">
+                    <button class="active">rover1</button>
+                    <button>rover2</button>
+                    <button>rover3</button>
+                </nav>
+                <section class="dashboard_roverDetails">
+                    <header>
+                        <h2>Rover</h2>
+                    </header>
+                    <p>
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. 
+                        Ipsum sunt blanditiis odit beatae pariatur, harum eius ex ad reiciendis, 
+                        mollitia quisquam iusto temporibus labore? Impedit 
+                        quidem asperiores architecto qui perferendis.
+                    </p>
+                </section>
+            </section>
+        </section>
+        <!-- <div id="root">
             <h1>Loading...</h1>
-        </div>
+        </div> -->
     </main>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/immutable/3.8.2/immutable.min.js" 
