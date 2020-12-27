@@ -1,5 +1,5 @@
 const store = {
-  user: { name: "Student" },
+  user: { name: "John" },
   apod: "",
   rovers: ["Curiosity", "Opportunity", "Spirit"],
 };
@@ -98,5 +98,33 @@ const getImageOfTheDay = (state) => {
     .then((res) => res.json())
     .then((apod) => updateStore(store, { apod }));
 
-  return data;
+  // return data;
 };
+
+// Example API call
+const getSpiritData = (state) => {
+  let { spirit } = state;
+  let data;
+  console.log("spirit is ", spirit);
+  console.log("store is ", store);
+
+  fetch("http://localhost:3000/spirit")
+    .then((res) => res.json())
+    .then((spiritData) => {
+      data = spiritData.spirit.rover;
+      console.log("spiritData is ", spiritData);
+      spirit = {
+        launchDate: data.launch_date,
+        landingDate: data.landing_date,
+        status: data.status,
+        dateMostRecentPhotos: data.max_date,
+        photos: spiritData.spiritPhotos.photos
+      };
+      updateStore(store, { spirit });
+      console.log("result is: ", store);
+    });
+
+  // return data;
+};
+
+getSpiritData(store);

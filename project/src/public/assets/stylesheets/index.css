@@ -37,6 +37,7 @@ main {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
 }
 
 .dashboard_roverList {
@@ -51,6 +52,9 @@ footer {
 /* -------------------  TABLET  --------------------- */
 @media (min-width: 768px) {
   /* use mobile */
+  .dashboard {
+    max-width: 600px;
+  }
 }
 
 /* -------------------  DESKTOP  -------------------- */
