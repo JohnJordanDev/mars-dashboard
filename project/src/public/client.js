@@ -2,10 +2,11 @@ const store = {
   user: { name: "John" },
   apod: "",
   rovers: ["Curiosity", "Opportunity", "Spirit"],
+  activeRover: "",
 };
 
 // add our markup to the page
-const root = document.getElementById("root");
+const root = document.getElementById("rover-root");
 
 const updateStore = (store, newState) => {
   store = Object.assign(store, newState);
@@ -17,29 +18,61 @@ const render = async (root, state) => {
 };
 
 // create content
-const App = (state) => {
-  const { rovers, apod } = state;
+// const App = (state) => {
+//   const { rovers, apod } = state;
 
+//   return `
+//         <header></header>
+//         <main>
+//             ${Greeting(store.user.name)}
+//             <section>
+//                 <h3>Put things on the page!</h3>
+//                 <p>Here is an example section.</p>
+//                 <p>
+//                     One of the most popular websites at NASA is the Astronomy Picture of the Day. In fact, this website is one of
+//                     the most popular websites across all federal agencies. It has the popular appeal of a Justin Bieber video.
+//                     This endpoint structures the APOD imagery and associated metadata so that it can be repurposed for other
+//                     applications. In addition, if the concept_tags parameter is set to True, then keywords derived from the image
+//                     explanation are returned. These keywords could be used as auto-generated hashtags for twitter or instagram feeds;
+//                     but generally help with discoverability of relevant imagery.
+//                 </p>
+//                 ${ImageOfTheDay(apod)}
+//             </section>
+//         </main>
+//         <footer></footer>
+//     `;
+// };
+
+const buildNavList = (roverList) => {
+  let list = "";
+  list = roverList.map((rover) => `<button>${rover}</button>`);
+  return list.join("");
+};
+
+const App = (state) => {
+  const { rovers } = state;
   return `
-        <header></header>
-        <main>
-            ${Greeting(store.user.name)}
-            <section>
-                <h3>Put things on the page!</h3>
-                <p>Here is an example section.</p>
-                <p>
-                    One of the most popular websites at NASA is the Astronomy Picture of the Day. In fact, this website is one of
-                    the most popular websites across all federal agencies. It has the popular appeal of a Justin Bieber video.
-                    This endpoint structures the APOD imagery and associated metadata so that it can be repurposed for other
-                    applications. In addition, if the concept_tags parameter is set to True, then keywords derived from the image
-                    explanation are returned. These keywords could be used as auto-generated hashtags for twitter or instagram feeds;
-                    but generally help with discoverability of relevant imagery.
-                </p>
-                ${ImageOfTheDay(apod)}
+  <section class="dashboard_gallery">
+                <button><</button>
+                <div><img height="300" width="300" src="" alt=""></div>
+                <button>></button>
             </section>
-        </main>
-        <footer></footer>
-    `;
+            <section class="dashboard_content">
+                <nav class="dashboard_roverList">
+                    ${buildNavList(rovers)}
+                </nav>
+                <section class="dashboard_roverDetails">
+                    <header>
+                        <h2>Rover</h2>
+                    </header>
+                    <p>
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. 
+                        Ipsum sunt blanditiis odit beatae pariatur, harum eius ex ad reiciendis, 
+                        mollitia quisquam iusto temporibus labore? Impedit 
+                        quidem asperiores architecto qui perferendis.
+                    </p>
+                </section>
+            </section>`;
 };
 
 // listening for load event because page should load before any JS is called
@@ -118,9 +151,10 @@ const getSpiritData = (state) => {
         landingDate: data.landing_date,
         status: data.status,
         dateMostRecentPhotos: data.max_date,
-        photos: spiritData.spiritPhotos.photos
+        photos: spiritData.spiritPhotos.photos,
       };
       updateStore(store, { spirit });
+      render(root, store);
       console.log("result is: ", store);
     });
 
