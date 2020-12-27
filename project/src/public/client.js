@@ -42,9 +42,19 @@ const render = async (root, state) => {
 //         <footer></footer>
 //     `;
 // };
+const isActive = (rover, state) => {
+  if (rover === state.activeRover) {
+    return "active";
+  }
+  return "";
+};
 
-const buildNavList = (roverList) =>
-  roverList.map((rover) => `<button>${rover}</button>`).join("");
+const buildNavList = (roverList, state) =>
+  roverList
+    .map(
+      (rover) => `<button class="dashboard_roverList-button ${isActive(rover, state)}">${rover}</button>`
+    )
+    .join("");
 
 const App = (state) => {
   const { rovers, activeRover } = state;
@@ -60,7 +70,7 @@ const App = (state) => {
             </section>
             <section class="dashboard_content">
                 <nav class="dashboard_roverList">
-                    ${buildNavList(rovers)}
+                    ${buildNavList(rovers, state)}
                 </nav>
                 <section class="dashboard_roverDetails">
                     <header>

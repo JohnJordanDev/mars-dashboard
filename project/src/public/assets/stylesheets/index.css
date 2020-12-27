@@ -51,6 +51,48 @@ ul {
   justify-content: space-around;
 }
 
+.dashboard_roverList-button {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  background-color: #EFEFEF;
+  border: none;
+}
+
+.dashboard_roverList-button:hover, 
+.dashboard_roverList-button:focus {
+  background-color: #AEAEAE;
+}
+
+.dashboard_roverList-button:focus {     
+  outline: solid 5px brown;
+}
+
+.dashboard_roverList-button.active {
+  position: relative;
+  font-weight: bold;
+  background-color: aquamarine;
+  border: solid 1px #000000;
+  border-bottom: none;
+}
+
+.dashboard_roverList-button.active::after {
+  position: absolute;
+  width: 100%;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 5px;
+  content: '';
+  background-color: aquamarine;
+}
+
+.dashboard_roverDetails {
+  border: solid 1px #000000;
+}
+
+
+
+
 footer {
   /* footer styles */
 }
