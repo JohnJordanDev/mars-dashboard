@@ -50,11 +50,13 @@ const buildNavList = (roverList) => {
 };
 
 const App = (state) => {
-  const { rovers } = state;
+  const { rovers, activeRover } = state;
+  const activeRoverData = state[activeRover.toLowerCase()];
   return `
   <section class="dashboard_gallery">
                 <button><</button>
-                <div><img height="300" width="300" src="" alt=""></div>
+                <div>
+                  <img height="300" width="300" src="${activeRoverData.photos[0].img_src}" alt="image from ${activeRover} rover"></div>
                 <button>></button>
             </section>
             <section class="dashboard_content">
@@ -63,14 +65,22 @@ const App = (state) => {
                 </nav>
                 <section class="dashboard_roverDetails">
                     <header>
-                        <h2>Rover</h2>
+                        <h2>${activeRover}</h2>
+                        <p>
+                          Rover facts: 
+                          <ul>
+                            <li>Launch Date: ${activeRoverData.launchDate}</li>
+                            <li>Landing Date: ${
+                              activeRoverData.landingDate
+                            }</li>
+                            <li>Status: ${activeRoverData.status}</li>
+                            <li>Date of most recent photos: ${
+                              activeRoverData.dateMostRecentPhotos
+                            }</li>
+                            
+                          </ul>
+                        </p>
                     </header>
-                    <p>
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-                        Ipsum sunt blanditiis odit beatae pariatur, harum eius ex ad reiciendis, 
-                        mollitia quisquam iusto temporibus labore? Impedit 
-                        quidem asperiores architecto qui perferendis.
-                    </p>
                 </section>
             </section>`;
 };
@@ -153,7 +163,7 @@ const getSpiritData = (state) => {
         dateMostRecentPhotos: data.max_date,
         photos: spiritData.spiritPhotos.photos,
       };
-      updateStore(store, { spirit });
+      updateStore(store, { spirit, activeRover: "Spirit" });
       render(root, store);
       console.log("result is: ", store);
     });
