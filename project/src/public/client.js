@@ -68,13 +68,19 @@ const getListRoverFacts = (activeRover) => `
       <li>Date of most recent photos: ${activeRover.dateMostRecentPhotos}</li>   
     </ul>`;
 
-const getActiveRoverData = (state) => 
-  state.allRoversData.filter((rover) => rover.name === state.activeRover)[0];
+const getActiveRoverData = (state) => state.allRoversData.filter((rover) => rover.name === state.activeRover)[0];
+
+// You'll definitely need to use ImmutableJS here
+const updateRoverData = (nameRoverToUpdate, newRoverData, state) => {
+  // let roverList = state.allRoversData;
+  // let roverToUpdate = roverList.filter(rover => rover.name === nameRoverToUpdate)[0];
+};
 
 const App = (state) => {
   const { rovers, activeRover } = state;
   const activeRoverData = getActiveRoverData(state);
   if (typeof activeRoverData === "undefined") {
+    console.log("loading...");
     return "<p>Loading...</p>";
   }
   return `
@@ -82,7 +88,7 @@ const App = (state) => {
                 <button id="image_decrementor"><</button>
                 <div>
                   <img height="300" width="300" src="${
-  activeRoverData.photos[0].img_src
+  activeRoverData.photos[activeRoverData.currrentImageIndex].img_src
 }" alt="image from ${activeRover} rover"></div>
                 <button id="image_incrementor">></button>
             </section>
@@ -173,8 +179,6 @@ const getRoverData = (roverName, state) => {
       // use immutableJS here
       allRoversData.push(rover);
       updateStore(store, { allRoversData, activeRover: "Spirit" });
-      render(root, store);
-      // console.log("result is: ", store);
     });
 
   // return data;
@@ -186,23 +190,61 @@ store.rovers.forEach((rover) => {
 
 const isTabButtonClicked = (elemId) => elemId.includes("tab_toggle");
 
-const capitaliseFirstLetter = string => string.slice(0,1).toUpperCase() + string.slice(1);
+const capitaliseFirstLetter = (string) => string.slice(0, 1).toUpperCase() + string.slice(1);
 
-const decreaseActiveRoverImageIndex = () => {};
+const getActiveRoverIndex = (state) => {
+  let activeRoverIndex;
+  state.allRoversData.forEach((rover, index) => {
+    if (rover.name === state.activeRover) {
+      activeRoverIndex = index;
+    }
+  });
+  return activeRoverIndex;
+};
 
-const increaseActiveRoverImageIndex = () => {};
+const decreaseActiveRoverImageIndex = (currentIndexP, photoList) => {
+  let currentIndex = currentIndexP;
+  if (currentIndex === 0) {
+    currentIndex = photoList.length - 1;
+  } else {
+    currentIndex -= 1;
+  }
+  return currentIndex;
+};
+
+const increaseActiveRoverImageIndex = (currentIndexP, photoList) => {
+  let currentIndex = currentIndexP;
+  if (currentIndex === photoList.length - 1) {
+    currentIndex = 0;
+  } else {
+    currentIndex += 1;
+  }
+  return currentIndex;
+};
+
+const updateActiveRoverGalleryImage = (state, changeCurrentIndexCb) => {
+  const allRoversDataCopy = state.allRoversData;
+  const activeRoverIndex = getActiveRoverIndex(state);
+  const activeRover = allRoversDataCopy[activeRoverIndex];
+  const photoList = activeRover.photos;
+  let currentIndex = activeRover.currrentImageIndex;
+  currentIndex = changeCurrentIndexCb(currentIndex, photoList);
+  activeRover.currrentImageIndex = currentIndex;
+  updateStore(state, { allRoversData: allRoversDataCopy });
+};
 
 window.document.addEventListener("click", (ev) => {
   const elemId = ev.target.id;
   if (isTabButtonClicked(elemId)) {
     const activeRover = capitaliseFirstLetter(elemId.split("_")[2]);
-    updateStore(store, {activeRover});
-  }
-  if(elemId === "image_decrementor") {
-    decreaseActiveRoverImageIndex();
+    updateStore(store, { activeRover });
   }
 
-  if(elemId === "image_incrementor") {
-    increaseActiveRoverImageIndex();
+  if (elemId === "image_decrementor") {
+    updateActiveRoverGalleryImage(store, decreaseActiveRoverImageIndex);
+  }
+
+  if (elemId === "image_incrementor") {
+    updateActiveRoverGalleryImage(store, increaseActiveRoverImageIndex);
   }
 });
