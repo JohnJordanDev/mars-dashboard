@@ -40,10 +40,10 @@ const buildNavList = (roverList, state) => roverList
 
 const getListRoverFacts = (activeRover) => `
     <ul>
-      <li>Launch Date: ${activeRover.launchDate}</li>
-      <li>Landing Date: ${activeRover.landingDate}</li>
-      <li>Status: ${activeRover.status}</li>
-      <li>Date of most recent photos: ${activeRover.dateMostRecentPhotos}</li>   
+      <li>Launch Date: ${activeRover.get("launchDate")}</li>
+      <li>Landing Date: ${activeRover.get("landingDate")}</li>
+      <li>Status: ${activeRover.get("status")}</li>
+      <li>Date of most recent photos: ${activeRoverget("dateMostRecentPhotos")}</li>   
     </ul>`;
 
 const getActiveRoverData = (state) => state.allRoversData.filter((rover) => rover.name === state.activeRover)[0];
