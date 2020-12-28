@@ -46,12 +46,22 @@ const getListRoverFacts = (activeRover) => `
       <li>Date of most recent photos: ${activeRover.get("dateMostRecentPhotos")}</li>   
     </ul>`;
 
-const getActiveRoverData = (state) => state.get("allRoversData").filter((rover) => rover.name === state.activeRover)[0];
+const getActiveRoverData = (state) => {
+  let indexOfActive = 0;
+  state.get("allRoversData").forEach((rover, index) => {
+    if (rover.name === state.get("activeRover")) {
+      indexOfActive = index;
+    }
+  });
+  console.log('list is: ', state.get("allRoversData"));
+  return state.get("allRoversData")[indexOfActive];
+};
 
 const App = (state) => {
   const rovers = state.get("rovers");
   const activeRover = state.get("activeRover");
   const activeRoverData = getActiveRoverData(state);
+  console.log('activeRover: ', activeRoverData);
   if (typeof activeRoverData === "undefined") {
     return "<p>Loading...</p>";
   }
