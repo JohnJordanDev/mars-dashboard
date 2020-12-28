@@ -2,7 +2,7 @@ const store = window.Immutable.Map({
   user: { name: "John" },
   apod: "",
   rovers: ["Curiosity", "Opportunity", "Spirit"],
-  activeRover: "",
+  activeRover: "Curiosity",
   allRoversData: []
 });
 
@@ -21,7 +21,7 @@ const updateStore = (state, newState) => {
 };
 
 const isActive = (rover, state) => {
-  if (rover === state.get("activeRover") {
+  if (rover === state.get("activeRover")) {
     return "active";
   }
   return "";
@@ -43,13 +43,14 @@ const getListRoverFacts = (activeRover) => `
       <li>Launch Date: ${activeRover.get("launchDate")}</li>
       <li>Landing Date: ${activeRover.get("landingDate")}</li>
       <li>Status: ${activeRover.get("status")}</li>
-      <li>Date of most recent photos: ${activeRoverget("dateMostRecentPhotos")}</li>   
+      <li>Date of most recent photos: ${activeRover.get("dateMostRecentPhotos")}</li>   
     </ul>`;
 
-const getActiveRoverData = (state) => state.allRoversData.filter((rover) => rover.name === state.activeRover)[0];
+const getActiveRoverData = (state) => state.get("allRoversData").filter((rover) => rover.name === state.activeRover)[0];
 
 const App = (state) => {
-  const { rovers, activeRover } = state;
+  const rovers = state.get("rovers");
+  const activeRover = state.get("activeRover");
   const activeRoverData = getActiveRoverData(state);
   if (typeof activeRoverData === "undefined") {
     return "<p>Loading...</p>";
@@ -88,7 +89,7 @@ window.addEventListener("load", () => {
 
 // Need to use ImmutableJS here
 const getRoverData = (roverName, state) => {
-  const { allRoversData } = state;
+  const allRoversData = state.get("allRoversData");
   let data;
   const lowerRoverName = roverName.toLowerCase();
   let rover;
@@ -116,10 +117,9 @@ const getRoverData = (roverName, state) => {
 };
 
 window.document.addEventListener("DOMContentLoaded", () => {
-  store.rovers.forEach((rover) => {
+  store.get("rovers").forEach((rover) => {
     getRoverData(rover, store);
   });
-  updateStore(store, { activeRover: store.rovers[0] });
 });
 
 const isTabButtonClicked = (elemId) => elemId.includes("tab_toggle");
