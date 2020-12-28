@@ -148,25 +148,26 @@ const getImageOfTheDay = (state) => {
 
 // Example API call
 // Need to use ImmutableJS here
-const getSpiritData = (roverName, state) => {
+const getRoverData = (roverName, state) => {
   let allRoversData = state.allRoversData;
   let data;
   const lowerRoverName = roverName.toLowerCase();
   let rover;
   console.log("roverData ", allRoversData);
 
-  fetch("http://localhost:3000/spirit")
+  fetch(`http://localhost:3000/${lowerRoverName}`)
     .then((res) => res.json())
-    .then((spiritData) => {
-      data = spiritData.spirit.rover;
+    .then((roverData) => {
+      data = roverData.spirit.rover;
       rover = {
         name: roverName,
         launchDate: data.launch_date,
         landingDate: data.landing_date,
         status: data.status,
         dateMostRecentPhotos: data.max_date,
-        photos: spiritData.spiritPhotos.photos
+        photos: roverData.spiritPhotos.photos
       };
+      // use immutableJS here
       allRoversData.push(rover);
       updateStore(store, { allRoversData, activeRover: "Spirit" });
       render(root, store);
@@ -176,4 +177,10 @@ const getSpiritData = (roverName, state) => {
   // return data;
 };
 
-getSpiritData("Spirit", store);
+store.rovers.forEach((rover)=>{
+  getRoverData(rover, store);
+});
+
+window.document.addEventListener('click', ev => {
+  const elemId = ev.target.dispatchEvent;
+});

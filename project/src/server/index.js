@@ -20,7 +20,35 @@ app.get("/spirit", async (req, res) => {
       `https://api.nasa.gov/mars-photos/api/v1/rovers/spirit/?api_key=${process.env.API_KEY}`
     ).then((res) => res.json());
     const spiritPhotos = await fetch(
-      `https://api.nasa.gov/mars-photos/api/v1/rovers/spirit/photos?sol=1000&api_key=${process.env.API_KEY}`
+      `https://api.nasa.gov/mars-photos/api/v1/rovers/spirit/photos?sol=1000&page=1&api_key=${process.env.API_KEY}`
+    ).then((res) => res.json());
+    res.send({ spirit, spiritPhotos });
+  } catch (err) {
+    console.log("error:", err);
+  }
+});
+
+app.get("/curiosity", async (req, res) => {
+  try {
+    const spirit = await fetch(
+      `https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/?api_key=${process.env.API_KEY}`
+    ).then((res) => res.json());
+    const spiritPhotos = await fetch(
+      `https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=1000&page=1&api_key=${process.env.API_KEY}`
+    ).then((res) => res.json());
+    res.send({ spirit, spiritPhotos });
+  } catch (err) {
+    console.log("error:", err);
+  }
+});
+
+app.get("/opportunity", async (req, res) => {
+  try {
+    const spirit = await fetch(
+      `https://api.nasa.gov/mars-photos/api/v1/rovers/opportunity/?api_key=${process.env.API_KEY}`
+    ).then((res) => res.json());
+    const spiritPhotos = await fetch(
+      `https://api.nasa.gov/mars-photos/api/v1/rovers/opportunity/photos?sol=1000&page=1&api_key=${process.env.API_KEY}`
     ).then((res) => res.json());
     res.send({ spirit, spiritPhotos });
   } catch (err) {
