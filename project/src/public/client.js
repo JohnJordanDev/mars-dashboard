@@ -9,13 +9,14 @@ const store = {
 // add our markup to the page
 const root = document.getElementById("rover-root");
 
-const updateStore = (store, newState) => {
-  store = Object.assign(store, newState);
-  render(root, store);
+const render = async (rootElem, state) => {
+  // eslint-disable-next-line no-param-reassign
+  rootElem.innerHTML = App(state);
 };
 
-const render = async (root, state) => {
-  root.innerHTML = App(state);
+const updateStore = (store, newState) => {
+  const newStore = Object.assign(store, newState);
+  render(root, newStore);
 };
 
 // create content
@@ -52,7 +53,7 @@ const isActive = (rover, state) => {
 
 const buildNavList = (roverList, state) => roverList
   .map(
-    (rover) => `<button class="dashboard_roverList-button ${isActive(
+    (rover) => `<button id="tab_toggle_${rover.toLowerCase()}" class="dashboard_roverList-button ${isActive(
       rover,
       state
     )}">${rover}</button>`
@@ -67,22 +68,23 @@ const getListRoverFacts = (activeRover) => `
       <li>Date of most recent photos: ${activeRover.dateMostRecentPhotos}</li>   
     </ul>`;
 
-const getActiveRoverData = (state) => state.allRoversData.filter(
-  (rover) => rover.name === state.activeRover
-)[0];
+const getActiveRoverData = (state) => 
+  state.allRoversData.filter((rover) => rover.name === state.activeRover)[0];
 
 const App = (state) => {
   const { rovers, activeRover } = state;
   const activeRoverData = getActiveRoverData(state);
   if (typeof activeRoverData === "undefined") {
-    return `<p>Loading...</p>`;
+    return "<p>Loading...</p>";
   }
   return `
   <section class="dashboard_gallery">
-                <button><</button>
+                <button id="image_decrementor"><</button>
                 <div>
-                  <img height="300" width="300" src="${activeRoverData.photos[0].img_src}" alt="image from ${activeRover} rover"></div>
-                <button>></button>
+                  <img height="300" width="300" src="${
+  activeRoverData.photos[0].img_src
+}" alt="image from ${activeRover} rover"></div>
+                <button id="image_incrementor">></button>
             </section>
             <section class="dashboard_content">
                 <nav class="dashboard_roverList">
@@ -149,7 +151,7 @@ const getImageOfTheDay = (state) => {
 // Example API call
 // Need to use ImmutableJS here
 const getRoverData = (roverName, state) => {
-  let allRoversData = state.allRoversData;
+  const { allRoversData } = state;
   let data;
   const lowerRoverName = roverName.toLowerCase();
   let rover;
@@ -165,7 +167,8 @@ const getRoverData = (roverName, state) => {
         landingDate: data.landing_date,
         status: data.status,
         dateMostRecentPhotos: data.max_date,
-        photos: roverData.spiritPhotos.photos
+        photos: roverData.spiritPhotos.photos,
+        currrentImageIndex: 0
       };
       // use immutableJS here
       allRoversData.push(rover);
@@ -177,10 +180,29 @@ const getRoverData = (roverName, state) => {
   // return data;
 };
 
-store.rovers.forEach((rover)=>{
+store.rovers.forEach((rover) => {
   getRoverData(rover, store);
 });
 
-window.document.addEventListener('click', ev => {
-  const elemId = ev.target.dispatchEvent;
+const isTabButtonClicked = (elemId) => elemId.includes("tab_toggle");
+
+const capitaliseFirstLetter = string => string.slice(0,1).toUpperCase() + string.slice(1);
+
+const decreaseActiveRoverImageIndex = () => {};
+
+const increaseActiveRoverImageIndex = () => {};
+
+window.document.addEventListener("click", (ev) => {
+  const elemId = ev.target.id;
+  if (isTabButtonClicked(elemId)) {
+    const activeRover = capitaliseFirstLetter(elemId.split("_")[2]);
+    updateStore(store, {activeRover});
+  }
+  if(elemId === "image_decrementor") {
+    decreaseActiveRoverImageIndex();
+  }
+
+  if(elemId === "image_incrementor") {
+    increaseActiveRoverImageIndex();
+  }
 });
