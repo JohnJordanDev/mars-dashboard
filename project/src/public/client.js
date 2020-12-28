@@ -26,7 +26,6 @@ const isActive = (rover, state) => {
   return "";
 };
 
-
 // ------------------------------------------------------  COMPONENTS
 
 const buildNavList = (roverList, state) => roverList
@@ -48,17 +47,10 @@ const getListRoverFacts = (activeRover) => `
 
 const getActiveRoverData = (state) => state.allRoversData.filter((rover) => rover.name === state.activeRover)[0];
 
-// You'll definitely need to use ImmutableJS here
-const updateRoverData = (nameRoverToUpdate, newRoverData, state) => {
-  // let roverList = state.allRoversData;
-  // let roverToUpdate = roverList.filter(rover => rover.name === nameRoverToUpdate)[0];
-};
-
 const App = (state) => {
   const { rovers, activeRover } = state;
   const activeRoverData = getActiveRoverData(state);
   if (typeof activeRoverData === "undefined") {
-    console.log("loading...");
     return "<p>Loading...</p>";
   }
   return `
@@ -93,18 +85,6 @@ window.addEventListener("load", () => {
 
 // ------------------------------------------------------  API CALLS
 
-// Example API call
-const getImageOfTheDay = (state) => {
-  const { apod } = state;
-
-  fetch("http://localhost:3000/apod")
-    .then((res) => res.json())
-    .then((apod) => updateStore(store, { apod }));
-
-  // return data;
-};
-
-// Example API call
 // Need to use ImmutableJS here
 const getRoverData = (roverName, state) => {
   const { allRoversData } = state;
@@ -134,11 +114,12 @@ const getRoverData = (roverName, state) => {
   // return data;
 };
 
-store.rovers.forEach((rover) => {
-  getRoverData(rover, store);
+window.document.addEventListener("DOMContentLoaded", () => {
+  store.rovers.forEach((rover) => {
+    getRoverData(rover, store);
+  });
+  updateStore(store, { activeRover: store.rovers[0] });
 });
-
-updateStore(store, { activeRover: store.rovers[0] });
 
 const isTabButtonClicked = (elemId) => elemId.includes("tab_toggle");
 
