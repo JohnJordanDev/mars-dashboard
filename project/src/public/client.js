@@ -1,10 +1,10 @@
-const store = {
+const store = window.Immutable.Map({
   user: { name: "John" },
   apod: "",
   rovers: ["Curiosity", "Opportunity", "Spirit"],
   activeRover: "",
   allRoversData: []
-};
+});
 
 // add our markup to the page
 const root = document.getElementById("rover-root");
@@ -14,13 +14,14 @@ const render = async (rootElem, state) => {
   rootElem.innerHTML = App(state);
 };
 
-const updateStore = (store, newState) => {
-  const newStore = Object.assign(store, newState);
+const updateStore = (state, newState) => {
+  //const newStore = Object.assign(store, newState);
+  const newStore = state.merge(newState);
   render(root, newStore);
 };
 
 const isActive = (rover, state) => {
-  if (rover === state.activeRover) {
+  if (rover === state.get("activeRover") {
     return "active";
   }
   return "";
