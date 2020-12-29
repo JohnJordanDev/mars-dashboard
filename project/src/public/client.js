@@ -106,6 +106,9 @@ window.addEventListener("load", () => {
 // Need to use ImmutableJS here
 
 const getUpdatedAllRoverDataList = (state, roverToAdd) => {
+  // Note to Udacity Mentor: this is the only way I could find to update the "allRoversData" Array, as 
+  // everything else just didn't update the  Array, or the 'push' method returned an array to the 'dummy' constant,
+  // when I wanted it to return the updated copy of the original "allRoversData" Array. 
   const currentList = state.get('allRoversData');
   const dummy = currentList.push(roverToAdd);
   return currentList;
