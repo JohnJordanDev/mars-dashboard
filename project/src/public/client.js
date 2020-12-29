@@ -1,4 +1,4 @@
-const store = window.Immutable.Map({
+const centralStore = window.Immutable.Map({
   user: { name: "John" },
   apod: "",
   rovers: ["Curiosity", "Opportunity", "Spirit"],
@@ -14,8 +14,7 @@ const render = async (rootElem, state) => {
   rootElem.innerHTML = App(state);
 };
 
-const updateStore = (state, newState) => {
-  //const newStore = Object.assign(store, newState);
+const updateCentralStore = (state, newState) => {
   const newStore = state.merge(newState);
   render(root, newStore);
 };
@@ -40,21 +39,25 @@ const buildNavList = (roverList, state) => roverList
 
 const getListRoverFacts = (activeRover) => `
     <ul>
-      <li>Launch Date: ${activeRover.get("launchDate")}</li>
-      <li>Landing Date: ${activeRover.get("landingDate")}</li>
-      <li>Status: ${activeRover.get("status")}</li>
-      <li>Date of most recent photos: ${activeRover.get("dateMostRecentPhotos")}</li>   
+      <li>Launch Date: ${activeRover.launchDate}</li>
+      <li>Landing Date: ${activeRover.landingDate}</li>
+      <li>Status: ${activeRover.status}</li>
+      <li>Date of most recent photos: ${activeRover.dateMostRecentPhotos}</li>   
     </ul>`;
 
 const getActiveRoverData = (state) => {
   let indexOfActive = 0;
+  const listOfRovers = state.get("allRoversData");
   state.get("allRoversData").forEach((rover, index) => {
+    console.log('rover is: ', rover);
     if (rover.name === state.get("activeRover")) {
       indexOfActive = index;
     }
   });
-  console.log('list is: ', state.get("allRoversData"));
-  return state.get("allRoversData")[indexOfActive];
+  // Data available, but cannot get access
+  console.log('This is an array: ', state.get("allRoversData"));
+  console.log('but I cannot access its members: ', state.get("allRoversData").get(0));
+  return state.get("allRoversData")[0];
 };
 
 const App = (state) => {
@@ -65,51 +68,59 @@ const App = (state) => {
   if (typeof activeRoverData === "undefined") {
     return "<p>Loading...</p>";
   }
-  return `
-  <section class="dashboard_gallery">
-                <button id="image_decrementor"><</button>
-                <div>
-                  <img height="300" width="300" src="${
+  if(typeof activeRoverData === "object") {
+    return `
+    <section class="dashboard_gallery">
+                  <button id="image_decrementor"><</button>
+                  <div>
+                    <img height="300" width="300" src="${
   activeRoverData.photos[activeRoverData.currrentImageIndex].img_src
 }" alt="image from ${activeRover} rover"></div>
-                <button id="image_incrementor">></button>
-            </section>
-            <section class="dashboard_content">
-                <nav class="dashboard_roverList">
-                    ${buildNavList(rovers, state)}
-                </nav>
-                <section class="dashboard_roverDetails">
-                    <header>
-                        <h2>${activeRover}</h2>
-                        <p>
-                          Rover facts: 
-                          ${getListRoverFacts(activeRoverData)}
-                        </p>
-                    </header>
-                </section>
-            </section>`;
+                  <button id="image_incrementor">></button>
+              </section>
+              <section class="dashboard_content">
+                  <nav class="dashboard_roverList">
+                      ${buildNavList(rovers, state)}
+                  </nav>
+                  <section class="dashboard_roverDetails">
+                      <header>
+                          <h2>${activeRover}</h2>
+                          <p>
+                            Rover facts: 
+                            ${getListRoverFacts(activeRoverData)}
+                          </p>
+                      </header>
+                  </section>
+              </section>`;
+  }
+
 };
 
 // listening for load event because page should load before any JS is called
 window.addEventListener("load", () => {
-  render(root, store);
+  render(root, centralStore);
 });
 
 // ------------------------------------------------------  API CALLS
 
 // Need to use ImmutableJS here
+
+const getUpdatedAllRoverDataList = (state, roverToAdd) => {
+  const currentList = state.get('allRoversData');
+  const dummy = currentList.push(roverToAdd);
+  return currentList;
+};
+
 const getRoverData = (roverName, state) => {
   const allRoversData = state.get("allRoversData");
   let data;
   const lowerRoverName = roverName.toLowerCase();
-  let rover;
-  console.log("roverData ", allRoversData);
 
   fetch(`http://localhost:3000/${lowerRoverName}`)
     .then((res) => res.json())
     .then((roverData) => {
       data = roverData.spirit.rover;
-      rover = {
+      const rover = {
         name: roverName,
         launchDate: data.launch_date,
         landingDate: data.landing_date,
@@ -118,17 +129,13 @@ const getRoverData = (roverName, state) => {
         photos: roverData.spiritPhotos.photos,
         currrentImageIndex: 0
       };
-      // use immutableJS here
-      allRoversData.push(rover);
-      updateStore(store, { allRoversData });
+      getUpdatedAllRoverDataList(state, rover);
     });
-
-  // return data;
 };
 
 window.document.addEventListener("DOMContentLoaded", () => {
-  store.get("rovers").forEach((rover) => {
-    getRoverData(rover, store);
+  centralStore.get("rovers").forEach((rover) => {
+    getRoverData(rover, centralStore);
   });
 });
 
@@ -174,21 +181,21 @@ const updateActiveRoverGalleryImage = (state, changeCurrentIndexCb) => {
   let currentIndex = activeRover.currrentImageIndex;
   currentIndex = changeCurrentIndexCb(currentIndex, photoList);
   activeRover.currrentImageIndex = currentIndex;
-  updateStore(state, { allRoversData: allRoversDataCopy });
+  updateCentralStore(centralStore, { allRoversData: allRoversDataCopy });
 };
 
 window.document.addEventListener("click", (ev) => {
   const elemId = ev.target.id;
   if (isTabButtonClicked(elemId)) {
     const activeRover = capitaliseFirstLetter(elemId.split("_")[2]);
-    updateStore(store, { activeRover });
+    updateCentralStore(centralStore, { activeRover });
   }
 
   if (elemId === "image_decrementor") {
-    updateActiveRoverGalleryImage(store, decreaseActiveRoverImageIndex);
+    updateActiveRoverGalleryImage(centralStore, decreaseActiveRoverImageIndex);
   }
 
   if (elemId === "image_incrementor") {
-    updateActiveRoverGalleryImage(store, increaseActiveRoverImageIndex);
+    updateActiveRoverGalleryImage(centralStore, increaseActiveRoverImageIndex);
   }
 });
