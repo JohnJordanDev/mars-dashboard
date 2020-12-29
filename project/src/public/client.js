@@ -1,10 +1,10 @@
 const centralStore = window.Immutable.Map({
   user: { name: "John" },
-  apod: "",
-  rovers: ["Curiosity", "Opportunity", "Spirit"],
-  activeRover: "Curiosity",
-  allRoversData: []
+  rovers: ["Curiosity", "Opportunity", "Spirit"]
 });
+
+window.allRoversData = [];
+window.activeRover = "Curiosity";
 
 // add our markup to the page
 const root = document.getElementById("rover-root");
@@ -19,8 +19,8 @@ const updateCentralStore = (state, newState) => {
   render(root, newStore);
 };
 
-const isActive = (rover, state) => {
-  if (rover === state.get("activeRover")) {
+const isActive = (rover) => {
+  if (rover === window.activeRover) {
     return "active";
   }
   return "";
@@ -28,12 +28,9 @@ const isActive = (rover, state) => {
 
 // ------------------------------------------------------  COMPONENTS
 
-const buildNavList = (roverList, state) => roverList
+const buildNavList = (roverList) => roverList
   .map(
-    (rover) => `<button id="tab_toggle_${rover.toLowerCase()}" class="dashboard_roverList-button ${isActive(
-      rover,
-      state
-    )}">${rover}</button>`
+    (rover) => `<button id="tab_toggle_${rover.toLowerCase()}" class="dashboard_roverList-button ${isActive(rover)}">${rover}</button>`
   )
   .join("");
 
@@ -45,25 +42,21 @@ const getListRoverFacts = (activeRover) => `
       <li>Date of most recent photos: ${activeRover.dateMostRecentPhotos}</li>   
     </ul>`;
 
-const getActiveRoverData = (state) => {
+const getActiveRoverData = () => {
   let indexOfActive = 0;
-  const listOfRovers = state.get("allRoversData");
-  state.get("allRoversData").forEach((rover, index) => {
-    console.log('rover is: ', rover);
-    if (rover.name === state.get("activeRover")) {
+  const listOfRovers = window.allRoversData;
+  listOfRovers.forEach((rover, index) => {
+    if (rover.name === window.activeRover) {
       indexOfActive = index;
     }
   });
-  // Data available, but cannot get access
-  console.log('This is an array: ', state.get("allRoversData"));
-  console.log('but I cannot access its members: ', state.get("allRoversData").get(0));
-  return state.get("allRoversData")[0];
+  return listOfRovers[indexOfActive];
 };
 
 const App = (state) => {
   const rovers = state.get("rovers");
-  const activeRover = state.get("activeRover");
-  const activeRoverData = getActiveRoverData(state);
+  const activeRover = state.get("activeRover") || window.activeRover;
+  const activeRoverData = getActiveRoverData();
   console.log('activeRover: ', activeRoverData);
   if (typeof activeRoverData === "undefined") {
     return "<p>Loading...</p>";
@@ -80,7 +73,7 @@ const App = (state) => {
               </section>
               <section class="dashboard_content">
                   <nav class="dashboard_roverList">
-                      ${buildNavList(rovers, state)}
+                      ${buildNavList(rovers)}
                   </nav>
                   <section class="dashboard_roverDetails">
                       <header>
@@ -103,19 +96,7 @@ window.addEventListener("load", () => {
 
 // ------------------------------------------------------  API CALLS
 
-// Need to use ImmutableJS here
-
-const getUpdatedAllRoverDataList = (state, roverToAdd) => {
-  // Note to Udacity Mentor: this is the only way I could find to update the "allRoversData" Array, as 
-  // everything else just didn't update the  Array, or the 'push' method returned an array to the 'dummy' constant,
-  // when I wanted it to return the updated copy of the original "allRoversData" Array. 
-  const currentList = state.get('allRoversData');
-  const dummy = currentList.push(roverToAdd);
-  return currentList;
-};
-
 const getRoverData = (roverName, state) => {
-  const allRoversData = state.get("allRoversData");
   let data;
   const lowerRoverName = roverName.toLowerCase();
 
@@ -132,7 +113,8 @@ const getRoverData = (roverName, state) => {
         photos: roverData.spiritPhotos.photos,
         currrentImageIndex: 0
       };
-      getUpdatedAllRoverDataList(state, rover);
+      window.allRoversData.push(rover);
+      updateCentralStore(state, { allRoversData: window.allRoversData });
     });
 };
 
@@ -146,10 +128,10 @@ const isTabButtonClicked = (elemId) => elemId.includes("tab_toggle");
 
 const capitaliseFirstLetter = (string) => string.slice(0, 1).toUpperCase() + string.slice(1);
 
-const getActiveRoverIndex = (state) => {
+const getActiveRoverIndex = (allRoversData) => {
   let activeRoverIndex;
-  state.allRoversData.forEach((rover, index) => {
-    if (rover.name === state.activeRover) {
+  allRoversData.forEach((rover, index) => {
+    if (rover.name === window.activeRover) {
       activeRoverIndex = index;
     }
   });
@@ -177,8 +159,8 @@ const increaseActiveRoverImageIndex = (currentIndexP, photoList) => {
 };
 
 const updateActiveRoverGalleryImage = (state, changeCurrentIndexCb) => {
-  const allRoversDataCopy = state.allRoversData;
-  const activeRoverIndex = getActiveRoverIndex(state);
+  const allRoversDataCopy = window.allRoversData;
+  const activeRoverIndex = getActiveRoverIndex(allRoversDataCopy);
   const activeRover = allRoversDataCopy[activeRoverIndex];
   const photoList = activeRover.photos;
   let currentIndex = activeRover.currrentImageIndex;
@@ -191,6 +173,7 @@ window.document.addEventListener("click", (ev) => {
   const elemId = ev.target.id;
   if (isTabButtonClicked(elemId)) {
     const activeRover = capitaliseFirstLetter(elemId.split("_")[2]);
+    window.activeRover = activeRover;
     updateCentralStore(centralStore, { activeRover });
   }
 
