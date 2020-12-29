@@ -6,7 +6,6 @@ const centralStore = window.Immutable.Map({
 window.allRoversData = [];
 window.activeRover = "Curiosity";
 
-// add our markup to the page
 const root = document.getElementById("rover-root");
 
 const render = async (rootElem, state) => {
@@ -57,11 +56,10 @@ const App = (state) => {
   const rovers = state.get("rovers");
   const activeRover = state.get("activeRover") || window.activeRover;
   const activeRoverData = getActiveRoverData();
-  console.log('activeRover: ', activeRoverData);
   if (typeof activeRoverData === "undefined") {
     return "<p>Loading...</p>";
   }
-  if(typeof activeRoverData === "object") {
+  if (typeof activeRoverData === "object") {
     return `
     <section class="dashboard_gallery">
                   <button id="image_decrementor"><</button>
@@ -86,10 +84,8 @@ const App = (state) => {
                   </section>
               </section>`;
   }
-
 };
 
-// listening for load event because page should load before any JS is called
 window.addEventListener("load", () => {
   render(root, centralStore);
 });
@@ -103,14 +99,15 @@ const getRoverData = (roverName, state) => {
   fetch(`http://localhost:3000/${lowerRoverName}`)
     .then((res) => res.json())
     .then((roverData) => {
-      data = roverData.spirit.rover;
+      console.log('roverData: ', roverData);
+      data = roverData.rover.rover;
       const rover = {
         name: roverName,
         launchDate: data.launch_date,
         landingDate: data.landing_date,
         status: data.status,
         dateMostRecentPhotos: data.max_date,
-        photos: roverData.spiritPhotos.photos,
+        photos: roverData.roverPhotos.photos,
         currrentImageIndex: 0
       };
       window.allRoversData.push(rover);
