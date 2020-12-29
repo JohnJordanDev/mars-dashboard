@@ -34,18 +34,18 @@ const buildNavList = (roverList) => roverList
   .join("");
 
 const getListRoverFacts = (activeRover) => `
-    <ul>
+    <ul class="dashboard_roverDetails-list">
       <li>Launch Date: ${activeRover.launchDate}</li>
       <li>Landing Date: ${activeRover.landingDate}</li>
       <li>Status: ${activeRover.status}</li>
       <li>Date of most recent photos: ${activeRover.dateMostRecentPhotos}</li>   
     </ul>`;
 
-const getActiveRoverData = () => {
+const getActiveRoverData = (activeRoverName) => {
   let indexOfActive = 0;
   const listOfRovers = window.allRoversData;
   listOfRovers.forEach((rover, index) => {
-    if (rover.name === window.activeRover) {
+    if (rover.name === activeRoverName) {
       indexOfActive = index;
     }
   });
@@ -54,20 +54,20 @@ const getActiveRoverData = () => {
 
 const App = (state) => {
   const rovers = state.get("rovers");
-  const activeRover = state.get("activeRover") || window.activeRover;
-  const activeRoverData = getActiveRoverData();
+  const {activeRover} = window;
+  const activeRoverData = getActiveRoverData(activeRover);
   if (typeof activeRoverData === "undefined") {
     return "<p>Loading...</p>";
   }
   if (typeof activeRoverData === "object") {
     return `
     <section class="dashboard_gallery">
-                  <button id="image_decrementor"><</button>
+                  <button id="image_decrementor" class="dashboard_gallery-button"><</button>
                   <div>
                     <img height="300" width="300" src="${
   activeRoverData.photos[activeRoverData.currrentImageIndex].img_src
 }" alt="image from ${activeRover} rover"></div>
-                  <button id="image_incrementor">></button>
+                  <button id="image_incrementor" class="dashboard_gallery-button">></button>
               </section>
               <section class="dashboard_content">
                   <nav class="dashboard_roverList">
@@ -155,7 +155,7 @@ const increaseActiveRoverImageIndex = (currentIndexP, photoList) => {
   return currentIndex;
 };
 
-const updateActiveRoverGalleryImage = (state, changeCurrentIndexCb) => {
+const updateActiveRoverGalleryImage = (changeCurrentIndexCb) => {
   const allRoversDataCopy = window.allRoversData;
   const activeRoverIndex = getActiveRoverIndex(allRoversDataCopy);
   const activeRover = allRoversDataCopy[activeRoverIndex];
@@ -163,7 +163,7 @@ const updateActiveRoverGalleryImage = (state, changeCurrentIndexCb) => {
   let currentIndex = activeRover.currrentImageIndex;
   currentIndex = changeCurrentIndexCb(currentIndex, photoList);
   activeRover.currrentImageIndex = currentIndex;
-  updateCentralStore(centralStore, { allRoversData: allRoversDataCopy });
+  render(root, centralStore);
 };
 
 window.document.addEventListener("click", (ev) => {
@@ -171,14 +171,14 @@ window.document.addEventListener("click", (ev) => {
   if (isTabButtonClicked(elemId)) {
     const activeRover = capitaliseFirstLetter(elemId.split("_")[2]);
     window.activeRover = activeRover;
-    updateCentralStore(centralStore, { activeRover });
+    render(root, centralStore);
   }
 
   if (elemId === "image_decrementor") {
-    updateActiveRoverGalleryImage(centralStore, decreaseActiveRoverImageIndex);
+    updateActiveRoverGalleryImage(decreaseActiveRoverImageIndex);
   }
 
   if (elemId === "image_incrementor") {
-    updateActiveRoverGalleryImage(centralStore, increaseActiveRoverImageIndex);
+    updateActiveRoverGalleryImage(increaseActiveRoverImageIndex);
   }
 });

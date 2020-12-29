@@ -7,14 +7,14 @@ body {
   min-height: 100vh;
 }
 
+h1, h2, h3 {
+  margin-bottom: 1rem;
+}
+
 img {
   display: block;
   max-width: 100%;
   height: auto;
-}
-
-header {
-  /* header styles */
 }
 
 main {
@@ -40,11 +40,35 @@ ul {
 }
 
 .dashboard_gallery {
+  min-height: 300px;
+  margin-bottom: 1rem;
+
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
 }
+
+.dashboard_gallery-button {
+  min-height: 3rem;
+  min-width: 3rem;
+
+  font-weight: bold;
+  padding: 0.25rem;
+  border-radius: 50%;
+
+  background-color: #EFEFEF;
+  border: none;
+
+  cursor: pointer;
+}
+
+
+.dashboard_gallery-button:hover {
+  background-color: #AEAEAE;
+  border: solid 1px #333333;
+}
+
 
 .dashboard_roverList {
   display: flex;
@@ -87,14 +111,12 @@ ul {
 }
 
 .dashboard_roverDetails {
+  padding: 1rem;
   border: solid 1px #000000;
 }
 
-
-
-
-footer {
-  /* footer styles */
+.dashboard_roverDetails-list {
+  font-size: 0.75rem;
 }
 
 /* -------------------  TABLET  --------------------- */
@@ -111,11 +133,17 @@ footer {
   /* use mobile */
   .dashboard {
     flex-direction: row;
+    align-items: center;
     max-width: 800px;
   }
 
   .dashboard_gallery, .dashboard_content {
     flex-basis: 50%;
+  }
+
+  .dashboard_gallery {
+    margin-bottom: 0;
+    margin-right: 2rem
   }
 }
 
